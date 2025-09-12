@@ -1,0 +1,28 @@
+name: Mirror IG RSS to GitHub Pages
+on:
+  schedule: [{ cron: "*/30 * * * *" }]   # tiap 30 menit
+  workflow_dispatch:                      # bisa dijalankan manual dari tab Actions
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Pull RSS from RSSHub
+        run: |
+          mkdir -p public/instagram/2/user/universitas_jayapura
+          curl -fsSL -A "Mozilla/5.0" \
+            "https://rsshub.app/instagram/2/user/universitas_jayapura" \
+            -o public/instagram/2/user/universitas_jayapura/index.xml
+
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
